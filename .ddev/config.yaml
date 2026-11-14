@@ -1,0 +1,26 @@
+name: cms-observer-client-wordpress
+type: wordpress
+# Only for the bundled WP-CLI; the instances get their own wp-config.php from `ddev install`
+disable_settings_management: true
+docroot: .Build/public
+# The lowest supported PHP version, so local runs catch syntax newer than the support matrix allows
+php_version: "8.1"
+webserver_type: nginx-fpm
+xdebug_enabled: false
+# One WordPress instance per version, see .ddev/nginx_full/wordpress-versions.conf and `ddev install`
+additional_hostnames:
+  - wp64
+  - wp71
+database:
+  type: mariadb
+  version: "10.11"
+hooks:
+  # .Build/ isn't in git, so the docroot is missing after a fresh clone
+  pre-start:
+    - exec-host: mkdir -p .Build/public
+  post-start:
+    - exec: composer install --no-scripts
+webimage_extra_packages: [php8.1-pcov]
+use_dns_when_possible: true
+composer_version: "2"
+corepack_enable: false

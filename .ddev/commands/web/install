@@ -1,0 +1,70 @@
+#!/usr/bin/env bash
+
+## Description: Install the WordPress instances (one per version) with this plugin symlinked in and activated.
+## Usage: install [6.4|7.1|all] [--multisite]
+## Example: "ddev install all" or "ddev install 7.1 --multisite"
+
+set -euo pipefail
+
+VERSIONS=(6.4 7.1)
+TARGET="all"
+MULTISITE=0
+for arg in "$@"; do
+    case "$arg" in
+        --multisite) MULTISITE=1 ;;
+        -*) echo "Unknown option '$arg'." >&2; exit 1 ;;
+        *) TARGET="$arg" ;;
+    esac
+done
+
+if [ "$TARGET" = "all" ]; then
+    set -- "${VERSIONS[@]}"
+elif [[ " ${VERSIONS[*]} " == *" $TARGET "* ]]; then
+    set -- "$TARGET"
+else
+    echo "Unknown version '$TARGET', use one of: ${VERSIONS[*]} all" >&2
+    exit 1
+fi
+
+for version in "$@"; do
+    dir="/var/www/html/.Build/$version"
+    database="wp_${version//./_}"
+    url="https://wp${version//./}.${DDEV_SITENAME}.${DDEV_TLD}"
+    wp=(wp --path="$dir" --url="$url")
+
+    echo "Installing WordPress $version at $url"
+    rm -rf "$dir"
+    mysql -uroot -proot -hdb -e "DROP DATABASE IF EXISTS \`$database\`; CREATE DATABASE \`$database\`;"
+    wp core download --version="$version" --path="$dir" --skip-content --quiet
+    mkdir -p "$dir/wp-content/plugins" "$dir/wp-content/themes"
+    "${wp[@]}" config create --dbname="$database" --dbuser=root --dbpass=root --dbhost=db --skip-check --quiet \
+        --extra-php <<'PHP'
+define('WP_ENVIRONMENT_TYPE', 'local');
+define('WP_DEBUG', true);
+define('WP_DEBUG_LOG', true);
+define('WP_DEBUG_DISPLAY', false);
+PHP
+
+    install_args=(--title="CMS Observer Client (WordPress $version)" --admin_user=admin --admin_password=password --admin_email=admin@example.com --skip-email)
+    if [ "$MULTISITE" = "1" ]; then
+        "${wp[@]}" core multisite-install "${install_args[@]}" --quiet
+        "${wp[@]}" site create --slug=second --title="Second site" --quiet
+    else
+        "${wp[@]}" core install "${install_args[@]}" --quiet
+    fi
+
+    # The plugin under development, plus two wordpress.org plugins as report data
+    ln -s /var/www/html "$dir/wp-content/plugins/cms-observer-client"
+    "${wp[@]}" plugin install hello-dolly classic-editor --quiet
+    "${wp[@]}" theme install twentytwentyfour --activate --quiet
+    if [ "$MULTISITE" = "1" ]; then
+        "${wp[@]}" plugin activate cms-observer-client --network --quiet
+        "${wp[@]}" plugin activate classic-editor --url="$url/second" --quiet
+    else
+        "${wp[@]}" plugin activate cms-observer-client classic-editor --quiet
+    fi
+    # Fills the update_plugins transient, which carries the wordpress.org slug of each plugin
+    "${wp[@]}" eval 'wp_update_plugins();'
+
+    echo "WordPress $version: $url/wp-admin/ (admin / password)"
+done

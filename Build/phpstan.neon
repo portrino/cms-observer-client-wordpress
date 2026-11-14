@@ -1,0 +1,41 @@
+includes:
+  - ../.Build/vendor/szepeviktor/phpstan-wordpress/extension.neon
+  - ../.Build/vendor/phpstan/phpstan-strict-rules/rules.neon
+  - ../.Build/vendor/phpstan/phpstan-deprecation-rules/rules.neon
+  - ../.Build/vendor/spaze/phpstan-disallowed-calls/extension.neon
+  - ../.Build/vendor/spaze/phpstan-disallowed-calls/disallowed-dangerous-calls.neon
+  - ../.Build/vendor/spaze/phpstan-disallowed-calls/disallowed-execution-calls.neon
+  - ../.Build/vendor/spaze/phpstan-disallowed-calls/disallowed-insecure-calls.neon
+  - ../.Build/vendor/spaze/phpstan-disallowed-calls/disallowed-loose-calls.neon
+  - ../.Build/vendor/tomasvotruba/cognitive-complexity/config/extension.neon
+  - ../.Build/vendor/tomasvotruba/type-coverage/config/extension.neon
+
+parameters:
+  level: 8
+  tmpDir: ../.Build/.phpstan
+
+  scanFiles:
+    - ../.Build/vendor/php-stubs/wp-cli-stubs/wp-cli-stubs.php
+
+  paths:
+    - ../Classes
+    - ../cms-observer-client.php
+    - ../uninstall.php
+
+  type_coverage:
+    return: 100
+    param: 100
+    property: 95
+    constant: 0 # Typed class constants need PHP 8.3
+
+  cognitive_complexity:
+    class: 10
+    function: 5
+
+  disallowedFunctionCalls:
+    -
+      function:
+        - 'var_dump()'
+        - 'print_r()'
+        - 'xdebug_break()'
+      message: 'Remove it, it was for debugging purposes.'

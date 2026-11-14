@@ -1,0 +1,35 @@
+{
+  "attribution": {
+    "commit": "",
+    "pr": ""
+  },
+  "permissions": {
+    "allow": [
+      "Bash(ddev exec 'curl -s \"http://127.0.0.1:8025/api/v1/*\"')",
+      "Bash(ddev exec *)",
+      "Bash(ddev describe)",
+      "Bash(ddev start)",
+      "Bash(ddev restart)",
+      "Bash(ddev stop)",
+      "Bash(ddev ssh)",
+      "Bash(git branch *)",
+      "Bash(git checkout *)",
+      "Bash(git commit *)",
+      "Bash(git diff *)",
+      "Bash(git status)",
+      "Bash(git tag *)",
+      "Read",
+      "Write",
+      "Edit"
+    ],
+    "deny": [
+      "Bash(curl *)",
+      "Bash(ddev delete)",
+      "Bash(rm -rf *)",
+      "Bash(sudo *)",
+      "Bash(wget *)",
+      "Read(./.env*.local)",
+      "Read(./.env.local.php)"
+    ]
+  }
+}

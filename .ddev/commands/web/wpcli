@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+
+## Description: Run WP-CLI in one or all WordPress instances.
+## Usage: wpcli [6.4|7.1|all] <wp-cli command>
+## Example: "ddev wpcli 7.1 cms-observer push --dry-run" or "ddev wpcli all plugin list"
+
+set -euo pipefail
+
+VERSIONS=(6.4 7.1)
+target="${1:-}"
+shift || true
+if [ "$target" = "all" ]; then
+    versions=("${VERSIONS[@]}")
+elif [[ " ${VERSIONS[*]} " == *" $target "* ]]; then
+    versions=("$target")
+else
+    echo "Usage: ddev wpcli <${VERSIONS[*]// /|}|all> <wp-cli command>" >&2
+    exit 1
+fi
+
+for version in "${versions[@]}"; do
+    [ "${#versions[@]}" -gt 1 ] && echo "== WordPress $version"
+    wp --path="/var/www/html/.Build/$version" --url="https://wp${version//./}.${DDEV_SITENAME}.${DDEV_TLD}" "$@"
+done
