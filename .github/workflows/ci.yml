@@ -1,0 +1,121 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    # only trigger action if commits to master branch are pushed,
+    # to prevent the action from being executed twice on pull requests
+    branches:
+      - master
+
+permissions:
+  contents: read
+
+jobs:
+  code-quality:
+    name: code quality - php${{ matrix.php }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Install PHP
+        uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
+        with:
+          php-version: "${{ matrix.php }}"
+          coverage: none
+          tools: composer:v2
+
+      # composer.lock isn't committed, so this resolves the newest packages that run on PHP 8.1 (config.platform)
+      - name: Install dependencies
+        run: composer update --no-scripts
+
+      - name: Run static code analysis
+        run: composer ci:static
+
+      - name: Run unit tests
+        run: composer test:unit
+    strategy:
+      fail-fast: false
+      matrix:
+        php: [ '8.1', '8.2', '8.3', '8.4', '8.5' ]
+
+  # Installs WordPress, activates the plugin and validates the report it would send
+  wordpress:
+    name: WordPress ${{ matrix.wordpress }} - php${{ matrix.php }}${{ matrix.multisite && ' - multisite' || '' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: wordpress
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping -proot" --health-interval=5s --health-timeout=5s --health-retries=20
+    env:
+      WP_CLI_ARGS: --path=wordpress --url=http://localhost
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          path: cms-observer-client
+
+      - name: Install PHP
+        uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
+        with:
+          php-version: "${{ matrix.php }}"
+          coverage: none
+          extensions: mysqli
+          tools: wp-cli
+
+      - name: Install WordPress
+        run: |
+          wp core download --version=${{ matrix.wordpress }} --skip-content $WP_CLI_ARGS
+          wp config create --dbname=wordpress --dbuser=root --dbpass=root --dbhost=127.0.0.1 --skip-check $WP_CLI_ARGS
+          if [ "${{ matrix.multisite }}" = "true" ]; then
+            wp core multisite-install --title=CI --admin_user=admin --admin_email=admin@example.com --skip-email $WP_CLI_ARGS
+            wp site create --slug=second $WP_CLI_ARGS
+          else
+            wp core install --title=CI --admin_user=admin --admin_email=admin@example.com --skip-email $WP_CLI_ARGS
+          fi
+          mkdir -p wordpress/wp-content/plugins
+          ln -s "$GITHUB_WORKSPACE/cms-observer-client" wordpress/wp-content/plugins/cms-observer-client
+          wp plugin activate cms-observer-client ${{ matrix.multisite && '--network' || '' }} $WP_CLI_ARGS
+
+      - name: Validate the report
+        run: |
+          wp cms-observer push --dry-run $WP_CLI_ARGS > report.json
+          cat report.json
+          php -r '
+            $report = json_decode(file_get_contents("report.json"), true, flags: JSON_THROW_ON_ERROR);
+            foreach (["coreVersion", "phpVersion", "dbVersion", "clientVersion", "applicationContext"] as $field) {
+                if (!is_string($report[$field] ?? null) || $report[$field] === "") {
+                    fwrite(STDERR, "Missing $field\n");
+                    exit(1);
+                }
+            }
+            if ($report["dbPlatform"] !== "mysql" || !in_array("cms-observer-client", array_column($report["extensions"], "name"), true)) {
+                fwrite(STDERR, "Unexpected dbPlatform or plugin list\n");
+                exit(1);
+            }
+            if ("${{ matrix.wordpress }}" !== "latest" && !str_starts_with($report["coreVersion"], "${{ matrix.wordpress }}")) {
+                fwrite(STDERR, "Unexpected coreVersion\n");
+                exit(1);
+            }
+          '
+
+      - name: Check the cron event
+        run: wp cron event list --fields=hook $WP_CLI_ARGS | grep -q cms_observer_client_push
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # WordPress 6.4 supports PHP up to 8.3
+          - { wordpress: '6.4', php: '8.1' }
+          - { wordpress: '6.4', php: '8.3' }
+          - { wordpress: 'latest', php: '8.1' }
+          - { wordpress: 'latest', php: '8.5' }
+          - { wordpress: 'latest', php: '8.3', multisite: true }
