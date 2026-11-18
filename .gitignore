@@ -3,3 +3,4 @@
 /vendor/
 composer.lock
 .claude/settings.local.json
+.ddev/config.zz-worktree.local.yaml

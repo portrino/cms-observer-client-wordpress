@@ -53,24 +53,27 @@ ddev composer test:unit:coverage
 
 ## WordPress Setup
 
-For testing the plugin, set up the WordPress instances (one per supported version, the plugin is symlinked in and
-activated):
+For testing the plugin, set up the WordPress instances (one per supported version, the plugin is required and
+activated) with the DDEV add-on [ddev-wordpress-multi-version-plugin](https://github.com/portrino/ddev-wordpress-multi-version-plugin):
 
 ```bash
 # Install all WordPress versions
 ddev install all
 
 # Or install a specific version, optionally as multisite network
-ddev install 6.4
-ddev install 7.1 --multisite
+ddev install 64
+ddev install 71 --multisite
 
 # Run WP-CLI commands in one or all instances
-ddev wpcli 7.1 cms-observer push --dry-run
-ddev wpcli all plugin list
+ddev 71 wp cms-observer push --dry-run
+ddev all wp plugin list
+
+# Open the intro page with links to every instance
+ddev open
 ```
 
-The instances are reachable at `https://wp64.cms-observer-client-wordpress.ddev.site/wp-admin/` and
-`https://wp71.cms-observer-client-wordpress.ddev.site/wp-admin/` (`admin` / `password`).
+The instances are reachable at `https://64.cms-observer-client-wordpress.ddev.site/wp-admin/` and
+`https://71.cms-observer-client-wordpress.ddev.site/wp-admin/` (`admin` / `Password1!`).
 
 ## Submit a pull request
 

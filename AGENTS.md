@@ -76,15 +76,19 @@ Ask the user before any breaking change, even while nothing is in production.
 
 ## Workflow
 
-DDEV with one WordPress instance per version in `.Build/<version>`, each on its
-own hostname (`wp64`, `wp71`), the plugin symlinked into `wp-content/plugins`.
+DDEV with the add-on `portrino/ddev-wordpress-multi-version-plugin`: one
+Composer-based WordPress instance per version (`WP_VERSIONS`, default `6.4 7.1`)
+in `.Build/<label>` (`7.1` -> `71`), each on its own hostname
+(`71.cms-observer-client-wordpress.ddev.site`), the plugin required from the
+project root. Docs: https://github.com/portrino/ddev-wordpress-multi-version-plugin.
 DDEV runs PHP 8.1, the lowest supported version. Dev tools live in
 `.Build/vendor`.
 
-- `ddev start`, `ddev install all` (or `ddev install 7.1 --multisite`),
-  `ddev wpcli 7.1 cms-observer push --dry-run`, `ddev wpcli all <command>`.
-  Login: `https://wp71.cms-observer-client-wordpress.ddev.site/wp-admin/`,
-  `admin` / `password`.
+- `ddev start`, `ddev install all` (or `ddev install 71 --multisite`),
+  `ddev 71 wp cms-observer push --dry-run`, `ddev all wp <command>`,
+  `ddev open` (intro page with every instance).
+  Login: `https://71.cms-observer-client-wordpress.ddev.site/wp-admin/`,
+  `admin` / `Password1!`.
 - `ddev composer test`: unit tests (`Build/phpunit.xml.dist`),
   `test:unit:coverage` adds coverage reports in `.Build/coverage`.
 - `ddev composer ci`: composer checks (normalize, audit, dependency analyser,
