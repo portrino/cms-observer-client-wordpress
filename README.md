@@ -17,7 +17,7 @@ This plugin reports a site's WordPress core version, PHP + DB versions, and inst
 Works on single sites and multisite networks. A network is reported as one site: its configuration is network-wide,
 and a plugin counts as active when it's network-activated or active on any site of the network.
 
-## Installation
+## 🔥 Installation
 
 ### Composer
 
@@ -35,7 +35,7 @@ Download `cms-observer-client-<version>.zip` from the
 
 Activate the plugin, on multisite network-wide.
 
-## Configuration
+## 🔧 Configuration
 
 1. On the Observer, register a new site with the type `wordpress` (using command line or web interface) and copy
    the printed token:
