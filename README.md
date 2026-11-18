@@ -4,7 +4,7 @@
 [![WordPress 6.4+](https://img.shields.io/badge/WordPress-6.4+-21759b.svg?logo=wordpress)](https://wordpress.org/download/releases/)
 [![PHP 8.1 - 8.5](https://img.shields.io/badge/PHP-8.1_--_8.5-4f5b93.svg?logo=php)](https://www.php.net/releases/)
 [![License](https://poser.pugx.org/portrino/cms-observer-client-wordpress/license)](https://packagist.org/packages/portrino/cms-observer-client-wordpress)
-[![CI](https://github.com/portrino/cms-observer-client-wordpress/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/portrino/cms-observer-client-wordpress/actions/workflows/ci.yml)
+[![CI](https://github.com/portrino/cms-observer-client-wordpress/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/portrino/cms-observer-client-wordpress/actions/workflows/ci.yml)
 
 This plugin reports a site's WordPress core version, PHP + DB versions, and installed plugin versions to a central
 [CMS Observer](https://github.com/portrino/cms-oberserver) instance, which flags insecure and outdated versions.

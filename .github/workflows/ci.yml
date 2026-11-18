@@ -3,10 +3,10 @@ name: CI
 on:
   pull_request:
   push:
-    # only trigger action if commits to master branch are pushed,
+    # only trigger action if commits to main branch are pushed,
     # to prevent the action from being executed twice on pull requests
     branches:
-      - master
+      - main
 
 permissions:
   contents: read
