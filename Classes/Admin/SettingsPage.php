@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Portrino\CmsObserverClient\Admin;
 
 use Portrino\CmsObserverClient\Configuration;
+use Portrino\CmsObserverClient\LastPushError;
 
 /**
  * Settings page for the API URL and token: under Settings on a single site, under
@@ -49,6 +50,7 @@ final class SettingsPage
         <div class="wrap">
             <h1><?php echo esc_html__('CMS Observer Client', 'cms-observer-client'); ?></h1>
             <?php SettingsSaveHandler::renderResultNotice(); ?>
+            <?php $this->renderLastErrorNotice(); ?>
             <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
                 <input type="hidden" name="action" value="<?php echo esc_attr(self::ACTION); ?>">
                 <?php wp_nonce_field(self::ACTION); ?>
@@ -68,6 +70,7 @@ final class SettingsPage
                             <input type="password" id="cms-observer-token" name="token" class="regular-text" autocomplete="new-password" value=""
                                 placeholder="<?php echo esc_attr($hasToken ? __('Saved, leave empty to keep it', 'cms-observer-client') : ''); ?>"<?php disabled($this->isOverridden(Configuration::TOKEN)); ?>>
                             <?php $this->renderSourceHint(Configuration::TOKEN); ?>
+                            <p class="description"><?php echo esc_html__('Prefer the environment variable or the constant in each environment: a token saved here lives in the database and travels with it, e.g. when staging gets a copy of the production database.', 'cms-observer-client'); ?></p>
                             <?php if ($hasToken && !$this->isOverridden(Configuration::TOKEN)) { ?>
                                 <p><label><input type="checkbox" name="remove_token" value="1"> <?php echo esc_html__('Remove the saved token', 'cms-observer-client'); ?></label></p>
                             <?php } ?>
@@ -78,6 +81,16 @@ final class SettingsPage
             </form>
         </div>
         <?php
+    }
+
+    private function renderLastErrorNotice(): void
+    {
+        $error = LastPushError::get();
+        if ($error !== '') {
+            /* translators: %s: error message */
+            $message = sprintf(__('The last report to the CMS Observer failed: %s', 'cms-observer-client'), $error);
+            echo '<div class="notice notice-error"><p>' . esc_html($message) . '</p></div>';
+        }
     }
 
     /**

@@ -9,13 +9,14 @@ final class ReportBuilder
     public function __construct(
         private readonly EnvironmentService $environmentService,
         private readonly PluginInventoryService $pluginInventoryService,
+        private readonly SiteDomains $siteDomains,
         private readonly string $pluginFile,
     ) {}
 
     /**
      * Field names follow the Observer's API, which calls plugins "extensions".
      *
-     * @return array{coreVersion: string, phpVersion: string, dbVersion: string, dbPlatform: string|null, clientVersion: string, applicationContext: string, extensions: list<array{name: string, title: string, version: string, active: bool}>}
+     * @return array{coreVersion: string, phpVersion: string, dbVersion: string, dbPlatform: string|null, clientVersion: string, applicationContext: string, domains: list<string>, extensions: list<array{name: string, title: string, version: string, active: bool}>}
      */
     public function build(): array
     {
@@ -26,6 +27,7 @@ final class ReportBuilder
             'dbPlatform' => $this->environmentService->getDatabasePlatform(),
             'clientVersion' => $this->getClientVersion(),
             'applicationContext' => $this->environmentService->getApplicationContext(),
+            'domains' => $this->siteDomains->get(),
             'extensions' => $this->pluginInventoryService->getInstalledPlugins(),
         ];
     }

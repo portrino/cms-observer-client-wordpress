@@ -19,6 +19,20 @@ final class ObserverApiClient
      */
     public function pushReport(array $report): void
     {
+        try {
+            $this->send($report);
+        } catch (\RuntimeException $e) {
+            LastPushError::save($e->getMessage());
+            throw $e;
+        }
+        LastPushError::clear();
+    }
+
+    /**
+     * @param array<string, mixed> $report
+     */
+    private function send(array $report): void
+    {
         $apiUrl = $this->configuration->getApiUrl();
         $token = $this->configuration->getToken();
         if ($apiUrl === '' || $token === '') {
@@ -40,12 +54,39 @@ final class ObserverApiClient
             'redirection' => 0,
         ]);
 
+        $this->checkResponse($response, $token);
+    }
+
+    /**
+     * @param array<string, mixed>|\WP_Error $response
+     */
+    private function checkResponse(array|\WP_Error $response, string $token): void
+    {
         if (is_wp_error($response)) {
             throw new \RuntimeException('Sending the report to the CMS Observer failed: ' . $response->get_error_message(), 1763150402);
         }
         $status = (int)wp_remote_retrieve_response_code($response);
+        // The reported domains don't match the site URL, e.g. a staging copy with the production database
+        if ($status === 409) {
+            throw new \RuntimeException(sprintf('CMS Observer rejected the report (HTTP 409): %s', $this->getErrorMessage($response, $token)), 1763150404);
+        }
         if ($status !== 202) {
             throw new \RuntimeException(sprintf('CMS Observer rejected the report (HTTP %d).', $status), 1763150403);
         }
+    }
+
+    /**
+     * @param array<string, mixed> $response
+     */
+    private function getErrorMessage(array $response, string $token): string
+    {
+        $body = json_decode(wp_remote_retrieve_body($response), true);
+        $message = is_array($body) && is_string($body['message'] ?? null) ? trim($body['message']) : '';
+        if ($message === '') {
+            return 'the reported domains don\'t match the site URL registered on the Observer.';
+        }
+
+        // Never show the token, even if the response echoes it
+        return str_replace($token, '***', $message);
     }
 }

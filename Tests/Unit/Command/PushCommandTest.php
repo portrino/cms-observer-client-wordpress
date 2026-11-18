@@ -13,6 +13,7 @@ use Portrino\CmsObserverClient\ObserverApiClient;
 use Portrino\CmsObserverClient\PluginInventoryService;
 use Portrino\CmsObserverClient\PluginSlugs;
 use Portrino\CmsObserverClient\ReportBuilder;
+use Portrino\CmsObserverClient\SiteDomains;
 use Portrino\CmsObserverClient\Tests\Unit\TestCase;
 
 final class PushCommandTest extends TestCase
@@ -30,6 +31,10 @@ final class PushCommandTest extends TestCase
         Functions\when('is_multisite')->justReturn(false);
         Functions\when('wp_parse_url')->alias('parse_url');
         Functions\when('is_wp_error')->justReturn(false);
+        Functions\when('home_url')->justReturn('https://example.com');
+        Functions\when('site_url')->justReturn('https://example.com');
+        Functions\when('update_site_option')->justReturn(true);
+        Functions\when('delete_site_option')->justReturn(true);
     }
 
     public function testDryRunPrintsTheReportWithoutSendingIt(): void
@@ -45,6 +50,7 @@ final class PushCommandTest extends TestCase
             'dbPlatform' => 'mariadb',
             'clientVersion' => '1.0.0',
             'applicationContext' => 'production',
+            'domains' => ['example.com'],
             'extensions' => [['name' => 'akismet', 'title' => 'Akismet', 'version' => '5.3', 'active' => true]],
         ], json_decode(\WP_CLI::$lines[0], true, flags: JSON_THROW_ON_ERROR));
     }
@@ -68,6 +74,16 @@ final class PushCommandTest extends TestCase
         $this->createCommand()->push([], []);
     }
 
+    public function testShowsTheObserversMessageOnAConflict(): void
+    {
+        Functions\when('wp_remote_post')->justReturn([]);
+        Functions\when('wp_remote_retrieve_response_code')->justReturn(409);
+        Functions\when('wp_remote_retrieve_body')->justReturn('{"message":"Domains don\'t match the site URL."}');
+
+        $this->expectExceptionMessage("WP_CLI::error: CMS Observer rejected the report (HTTP 409): Domains don't match the site URL.");
+        $this->createCommand()->push([], []);
+    }
+
     private function createCommand(): PushCommand
     {
         Functions\when('get_site_option')->alias(static fn(string $option, mixed $default = false): mixed => match ($option) {
@@ -80,6 +96,7 @@ final class PushCommandTest extends TestCase
             new ReportBuilder(
                 new EnvironmentService(new \wpdb(true, '10.11.19-MariaDB')),
                 new PluginInventoryService(new PluginSlugs(), new ActivePluginFiles()),
+                new SiteDomains(),
                 '/path/to/cms-observer-client.php'
             ),
             new ObserverApiClient(new Configuration())

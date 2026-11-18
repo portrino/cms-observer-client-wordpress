@@ -50,6 +50,19 @@ Activate the plugin, on multisite network-wide.
    environment variables. They take precedence over the settings page (environment variable first), so a shared
    `wp-config.php` can serve several environments.
 
+### Several environments (production, staging, …)
+
+- Set the token for each environment as environment variable or constant in `wp-config.php`, not on the settings
+  page. A token saved on the settings page lives in `wp_options` and is copied along with the database, e.g. when
+  staging gets the production database, and staging would then report as production. The Observer catches this
+  as long as staging has a different domain: the report carries all domains of the site (`domains`), and the
+  Observer rejects it with HTTP 409 when none matches the registered site URL. WP-CLI shows the Observer's
+  message, the settings page shows the last failed push.
+- Register the site on the Observer with exactly the host WordPress uses (`home_url()`): the comparison is exact,
+  `www.example.com` doesn't match `example.com`.
+- Set `WP_ENVIRONMENT_TYPE` in each environment's `wp-config.php` (e.g. `define('WP_ENVIRONMENT_TYPE', 'staging');`),
+  the report sends it as `applicationContext`. Without it WordPress reports `production`.
+
 ## 🚀 Run
 
 The plugin sends the report once a day via WP-Cron. On sites with low traffic, or with `DISABLE_WP_CRON`, run

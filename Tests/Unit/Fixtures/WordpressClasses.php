@@ -17,6 +17,13 @@ final class wpdb
     }
 }
 
+final class WP_Site
+{
+    public function __construct(
+        public string $domain,
+    ) {}
+}
+
 final class WP_Error
 {
     public function __construct(

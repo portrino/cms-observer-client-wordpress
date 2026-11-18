@@ -62,11 +62,21 @@ WordPress 6.4+ on PHP 8.1+. Every change must work on all of them:
 {
   "coreVersion": "7.1", "phpVersion": "8.3.0", "dbVersion": "10.11.19-MariaDB",
   "dbPlatform": "mariadb", "clientVersion": "1.0.0", "applicationContext": "production",
+  "domains": ["example.com"],
   "extensions": [
     {"name": "akismet", "title": "Akismet", "version": "5.3", "active": true}
   ]
 }
 ```
+
+`domains` (`SiteDomains`): all hosts of the instance,
+lowercase, without scheme, port or path, unique and sorted; the hosts of
+`home_url()` and `site_url()`, on multisite the domains of all sites. Empty
+array when there is none, never `null`. The Observer answers 409 when no
+domain matches the site URL (e.g. staging with the production database and
+token); the push fails with the `message` of the JSON body, the token is
+masked. The last failed push is kept in a network option (`LastPushError`)
+and shown on the settings page.
 
 The site must be created on the Observer with the type `wordpress`. Sites
 update the client late or never, so the Observer must keep accepting older

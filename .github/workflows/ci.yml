@@ -101,6 +101,10 @@ jobs:
                 fwrite(STDERR, "Unexpected dbPlatform or plugin list\n");
                 exit(1);
             }
+            if (($report["domains"] ?? null) !== ["localhost"]) {
+                fwrite(STDERR, "Unexpected domains\n");
+                exit(1);
+            }
             if ("${{ matrix.wordpress }}" !== "latest" && !str_starts_with($report["coreVersion"], "${{ matrix.wordpress }}")) {
                 fwrite(STDERR, "Unexpected coreVersion\n");
                 exit(1);
