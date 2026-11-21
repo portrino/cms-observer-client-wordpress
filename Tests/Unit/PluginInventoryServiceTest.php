@@ -24,10 +24,10 @@ final class PluginInventoryServiceTest extends TestCase
         ]);
 
         self::assertSame([
-            ['name' => 'hello-dolly', 'title' => 'Hello Dolly', 'version' => '1.7.2', 'active' => false],
-            ['name' => 'akismet', 'title' => 'Akismet', 'version' => '5.3', 'active' => true],
-            ['name' => 'custom', 'title' => 'Custom', 'version' => '2.0.0', 'active' => false],
-            ['name' => 'single-file', 'title' => 'Single file', 'version' => '1.0', 'active' => false],
+            ['name' => 'hello-dolly', 'type' => 'plugin', 'title' => 'Hello Dolly', 'version' => '1.7.2', 'active' => false],
+            ['name' => 'akismet', 'type' => 'plugin', 'title' => 'Akismet', 'version' => '5.3', 'active' => true],
+            ['name' => 'custom', 'type' => 'plugin', 'title' => 'Custom', 'version' => '2.0.0', 'active' => false],
+            ['name' => 'single-file', 'type' => 'plugin', 'title' => 'Single file', 'version' => '1.0', 'active' => false],
         ], $this->createService()->getInstalledPlugins());
     }
 
@@ -36,7 +36,7 @@ final class PluginInventoryServiceTest extends TestCase
         $this->mockPlugins(['bare/bare.php' => ['Name' => ' ', 'Version' => '']], [], false);
 
         self::assertSame(
-            [['name' => 'bare', 'title' => 'bare', 'version' => '0.0.0', 'active' => false]],
+            [['name' => 'bare', 'type' => 'plugin', 'title' => 'bare', 'version' => '0.0.0', 'active' => false]],
             $this->createService()->getInstalledPlugins()
         );
     }

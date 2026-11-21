@@ -15,6 +15,7 @@ use Portrino\CmsObserverClient\PluginSlugs;
 use Portrino\CmsObserverClient\ReportBuilder;
 use Portrino\CmsObserverClient\SiteDomains;
 use Portrino\CmsObserverClient\Tests\Unit\TestCase;
+use Portrino\CmsObserverClient\ThemeInventoryService;
 
 final class PushCommandTest extends TestCase
 {
@@ -26,7 +27,12 @@ final class PushCommandTest extends TestCase
         Functions\when('wp_get_environment_type')->justReturn('production');
         Functions\when('get_file_data')->justReturn(['Version' => '1.0.0']);
         Functions\when('get_plugins')->justReturn(['akismet/akismet.php' => ['Name' => 'Akismet', 'Version' => '5.3']]);
-        Functions\when('get_option')->justReturn(['akismet/akismet.php']);
+        Functions\when('get_option')->alias(static fn(string $option): mixed => match ($option) {
+            'active_plugins' => ['akismet/akismet.php'],
+            'stylesheet', 'template' => 'twentytwentyfour',
+            default => false,
+        });
+        Functions\when('wp_get_themes')->justReturn(['twentytwentyfour' => new \WP_Theme(['Name' => 'Twenty Twenty-Four', 'Version' => '1.2'])]);
         Functions\when('get_site_transient')->justReturn(false);
         Functions\when('is_multisite')->justReturn(false);
         Functions\when('wp_parse_url')->alias('parse_url');
@@ -51,7 +57,10 @@ final class PushCommandTest extends TestCase
             'clientVersion' => '1.0.0',
             'applicationContext' => 'production',
             'domains' => ['example.com'],
-            'extensions' => [['name' => 'akismet', 'title' => 'Akismet', 'version' => '5.3', 'active' => true]],
+            'packages' => [
+                ['name' => 'akismet', 'type' => 'plugin', 'title' => 'Akismet', 'version' => '5.3', 'active' => true],
+                ['name' => 'twentytwentyfour', 'type' => 'theme', 'title' => 'Twenty Twenty-Four', 'version' => '1.2', 'active' => true],
+            ],
         ], json_decode(\WP_CLI::$lines[0], true, flags: JSON_THROW_ON_ERROR));
     }
 
@@ -62,7 +71,7 @@ final class PushCommandTest extends TestCase
 
         $this->createCommand()->push([], []);
 
-        self::assertSame(['Success: Reported WordPress 7.1, PHP ' . PHP_VERSION . ', 1 plugins to the CMS Observer.'], \WP_CLI::$lines);
+        self::assertSame(['Success: Reported WordPress 7.1, PHP ' . PHP_VERSION . ', 1 plugins and 1 themes to the CMS Observer.'], \WP_CLI::$lines);
     }
 
     public function testFailsWithTheErrorMessageWhenSendingFails(): void
@@ -96,6 +105,7 @@ final class PushCommandTest extends TestCase
             new ReportBuilder(
                 new EnvironmentService(new \wpdb(true, '10.11.19-MariaDB')),
                 new PluginInventoryService(new PluginSlugs(), new ActivePluginFiles()),
+                new ThemeInventoryService(),
                 new SiteDomains(),
                 '/path/to/cms-observer-client.php'
             ),

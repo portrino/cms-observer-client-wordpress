@@ -50,10 +50,11 @@ final class PushCommand
         }
 
         \WP_CLI::success(sprintf(
-            'Reported WordPress %s, PHP %s, %d plugins to the CMS Observer.',
+            'Reported WordPress %s, PHP %s, %d plugins and %d themes to the CMS Observer.',
             $report['coreVersion'],
             $report['phpVersion'],
-            count($report['extensions'])
+            count(array_filter($report['packages'], static fn(array $package): bool => $package['type'] === 'plugin')),
+            count(array_filter($report['packages'], static fn(array $package): bool => $package['type'] === 'theme'))
         ));
     }
 }

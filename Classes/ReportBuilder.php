@@ -9,14 +9,15 @@ final class ReportBuilder
     public function __construct(
         private readonly EnvironmentService $environmentService,
         private readonly PluginInventoryService $pluginInventoryService,
+        private readonly ThemeInventoryService $themeInventoryService,
         private readonly SiteDomains $siteDomains,
         private readonly string $pluginFile,
     ) {}
 
     /**
-     * Field names follow the Observer's API, which calls plugins "extensions".
+     * "packages" holds plugins and themes, each with its "type" (needs CMS Observer 0.7.0 or newer).
      *
-     * @return array{coreVersion: string, phpVersion: string, dbVersion: string, dbPlatform: string|null, clientVersion: string, applicationContext: string, domains: list<string>, extensions: list<array{name: string, title: string, version: string, active: bool}>}
+     * @return array{coreVersion: string, phpVersion: string, dbVersion: string, dbPlatform: string|null, clientVersion: string, applicationContext: string, domains: list<string>, packages: list<array{name: string, type: string, title: string, version: string, active: bool}>}
      */
     public function build(): array
     {
@@ -28,7 +29,10 @@ final class ReportBuilder
             'clientVersion' => $this->getClientVersion(),
             'applicationContext' => $this->environmentService->getApplicationContext(),
             'domains' => $this->siteDomains->get(),
-            'extensions' => $this->pluginInventoryService->getInstalledPlugins(),
+            'packages' => [
+                ...$this->pluginInventoryService->getInstalledPlugins(),
+                ...$this->themeInventoryService->getInstalledThemes(),
+            ],
         ];
     }
 

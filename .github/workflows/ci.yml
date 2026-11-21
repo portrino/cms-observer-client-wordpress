@@ -97,8 +97,10 @@ jobs:
                     exit(1);
                 }
             }
-            if ($report["dbPlatform"] !== "mysql" || !in_array("cms-observer-client", array_column($report["extensions"], "name"), true)) {
-                fwrite(STDERR, "Unexpected dbPlatform or plugin list\n");
+            $plugins = array_column(array_filter($report["packages"], fn ($package) => $package["type"] === "plugin"), "name");
+            $activeThemes = array_filter($report["packages"], fn ($package) => $package["type"] === "theme" && $package["active"]);
+            if ($report["dbPlatform"] !== "mysql" || !in_array("cms-observer-client", $plugins, true) || $activeThemes === []) {
+                fwrite(STDERR, "Unexpected dbPlatform or package list\n");
                 exit(1);
             }
             if (($report["domains"] ?? null) !== ["localhost"]) {

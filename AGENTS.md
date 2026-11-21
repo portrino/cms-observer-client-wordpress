@@ -30,9 +30,14 @@ WordPress 6.4+ on PHP 8.1+. Every change must work on all of them:
   `cms_observer_client_push` (scheduled on `init`, because the activation hook
   doesn't fire for DB or Composer-based activation), WP-CLI command
   `wp cms-observer push [--dry-run]`, settings page.
-- `ReportBuilder` → `EnvironmentService` (versions, `wp_get_environment_type()`)
-  and `PluginInventoryService` (all installed plugins, active or not) →
+- `ReportBuilder` → `EnvironmentService` (versions, `wp_get_environment_type()`),
+  `PluginInventoryService` (all installed plugins, active or not) and
+  `ThemeInventoryService` (all installed themes, active or not) →
   `ObserverApiClient`.
+- Theme names are their directories (`wp_get_themes()` keys), which are the
+  wordpress.org slugs. A theme counts as active when it's the active theme or
+  the parent of the active child theme (option `stylesheet`/`template`), on
+  multisite on any site of the network.
 - Plugin names are wordpress.org slugs (`PluginSlugs`), which the Observer
   matches against wordpress.org and Wordfence. The slug isn't always the
   directory (`hello.php` is `hello-dolly`); it comes from the `update_plugins`
@@ -41,7 +46,8 @@ WordPress 6.4+ on PHP 8.1+. Every change must work on all of them:
   `db_version()` strips), `dbPlatform` is `mariadb`, `mysql` or `null` for
   non-MySQL databases (SQLite plugin).
 - The Observer rejects a report with an empty `title`, `version` or
-  `dbVersion` (422), so they fall back to the slug, `0.0.0` and `unknown`.
+  `dbVersion` (422), so they fall back to the slug, `0.0.0` and `unknown`,
+  for plugins and themes alike.
 - Configuration (`Configuration`): API URL and token from the environment
   variables `CMS_OBSERVER_API_URL` / `CMS_OBSERVER_TOKEN`, then the constants
   of the same name (wp-config.php), then the settings page. The settings page
@@ -63,11 +69,16 @@ WordPress 6.4+ on PHP 8.1+. Every change must work on all of them:
   "coreVersion": "7.1", "phpVersion": "8.3.0", "dbVersion": "10.11.19-MariaDB",
   "dbPlatform": "mariadb", "clientVersion": "1.0.0", "applicationContext": "production",
   "domains": ["example.com"],
-  "extensions": [
-    {"name": "akismet", "title": "Akismet", "version": "5.3", "active": true}
+  "packages": [
+    {"name": "akismet", "type": "plugin", "title": "Akismet", "version": "5.3", "active": true},
+    {"name": "twentytwentyfour", "type": "theme", "title": "Twenty Twenty-Four", "version": "1.2", "active": true}
   ]
 }
 ```
+
+`packages` (since 2.0.0, needs CMS Observer 0.7.0 or newer; 1.x sent the
+plugins as `extensions`): every installed plugin and theme, active or not, with
+its `type`. The list is complete: the Observer removes what's missing from it.
 
 `domains` (`SiteDomains`): all hosts of the instance,
 lowercase, without scheme, port or path, unique and sorted; the hosts of

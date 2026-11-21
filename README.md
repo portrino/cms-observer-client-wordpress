@@ -6,7 +6,7 @@
 [![License](https://poser.pugx.org/portrino/cms-observer-client-wordpress/license)](https://packagist.org/packages/portrino/cms-observer-client-wordpress)
 [![CI](https://github.com/portrino/cms-observer-client-wordpress/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/portrino/cms-observer-client-wordpress/actions/workflows/ci.yml)
 
-This plugin reports a site's WordPress core version, PHP + DB versions, and installed plugin versions to a central
+This plugin reports a site's WordPress core version, PHP + DB versions, and installed plugin and theme versions to a central
 [CMS Observer](https://github.com/portrino/cms-oberserver) instance, which flags insecure and outdated versions.
 
 > [!IMPORTANT]
@@ -14,8 +14,11 @@ This plugin reports a site's WordPress core version, PHP + DB versions, and inst
 > useless. So set up your central CMS Observer instance first and then connect any number of WordPress sites by using
 > this client.
 
+Needs CMS Observer 0.7.0 or newer (version 1.x of this plugin works with older ones, without themes).
+
 Works on single sites and multisite networks. A network is reported as one site: its configuration is network-wide,
-and a plugin counts as active when it's network-activated or active on any site of the network.
+and a plugin or theme counts as active when it's active on any site of the network (a plugin also when
+network-activated). The parent of an active child theme counts as active too.
 
 ## 🔥 Installation
 

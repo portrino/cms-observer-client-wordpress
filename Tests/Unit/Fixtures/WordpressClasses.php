@@ -56,3 +56,18 @@ final class WP_CLI
         throw new \RuntimeException('WP_CLI::error: ' . $message);
     }
 }
+
+final class WP_Theme
+{
+    /**
+     * @param array<string, string|false> $headers
+     */
+    public function __construct(
+        private readonly array $headers,
+    ) {}
+
+    public function get(string $header): string|false
+    {
+        return $this->headers[$header] ?? false;
+    }
+}

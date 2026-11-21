@@ -16,7 +16,7 @@ final class PluginInventoryService
     ) {}
 
     /**
-     * @return list<array{name: string, title: string, version: string, active: bool}>
+     * @return list<array{name: string, type: string, title: string, version: string, active: bool}>
      */
     public function getInstalledPlugins(): array
     {
@@ -32,6 +32,7 @@ final class PluginInventoryService
             // The Observer rejects a report with an empty title or version
             $plugins[] = [
                 'name' => $slug,
+                'type' => 'plugin',
                 'title' => $this->getHeader($data, 'Name', $slug),
                 'version' => $this->getHeader($data, 'Version', '0.0.0'),
                 'active' => in_array($file, $activeFiles, true),

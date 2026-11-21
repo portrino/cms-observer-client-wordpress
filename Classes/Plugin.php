@@ -64,6 +64,7 @@ final class Plugin
         return new ReportBuilder(
             new EnvironmentService($wpdb instanceof \wpdb ? $wpdb : null),
             new PluginInventoryService(new PluginSlugs(), new ActivePluginFiles()),
+            new ThemeInventoryService(),
             new SiteDomains(),
             $this->pluginFile,
         );
