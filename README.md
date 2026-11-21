@@ -7,10 +7,10 @@
 [![CI](https://github.com/portrino/cms-observer-client-wordpress/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/portrino/cms-observer-client-wordpress/actions/workflows/ci.yml)
 
 This plugin reports a site's WordPress core version, PHP + DB versions, and installed plugin and theme versions to a central
-[CMS Observer](https://github.com/portrino/cms-oberserver) instance, which flags insecure and outdated versions.
+[CMS Observer](https://github.com/portrino/cms-observer) instance, which flags insecure and outdated versions.
 
 > [!IMPORTANT]
-> Without a central [CMS Observer](https://github.com/portrino/cms-oberserver) instance this plugin is somewhat
+> Without a central [CMS Observer](https://github.com/portrino/cms-observer) instance this plugin is somewhat
 > useless. So set up your central CMS Observer instance first and then connect any number of WordPress sites by using
 > this client.
 
