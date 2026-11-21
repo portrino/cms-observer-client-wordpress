@@ -80,7 +80,7 @@
         "ci:composer:audit": "@composer audit --abandoned=ignore --ignore-unreachable",
         "ci:composer:normalize": "@composer normalize --no-check-lock --dry-run",
         "ci:composer:psr-verify": "@composer dumpautoload --optimize --strict-psr",
-        "ci:json:lint": "find . ! -path '*.Build/*' ! -path '*node_modules/*' -name '*.json' | xargs -r php .Build/bin/jsonlint -q",
+        "ci:json:lint": "find . ! -path '*.Build/*' ! -path './.ddev/*' ! -path '*node_modules/*' -name '*.json' | xargs -r php .Build/bin/jsonlint -q",
         "ci:php": [
             "@ci:php:cs-fixer",
             "@ci:php:lint",
@@ -99,7 +99,7 @@
             "@ci:php:stan",
             "@ci:yaml:lint"
         ],
-        "ci:yaml:lint": "find . ! -path '*.Build/*' ! -path '*node_modules/*' -regextype egrep -regex '.*.ya?ml$' | xargs -r php ./.Build/bin/yaml-lint",
+        "ci:yaml:lint": "find . ! -path '*.Build/*' ! -path './.ddev/*' ! -path '*node_modules/*' -regextype egrep -regex '.*.ya?ml$' | xargs -r php ./.Build/bin/yaml-lint",
         "fix": [
             "@fix:php"
         ],
