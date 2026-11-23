@@ -73,7 +73,7 @@ jobs:
 
       - name: Install WordPress
         run: |
-          wp core download --version=${{ matrix.wordpress }} --skip-content $WP_CLI_ARGS
+          wp core download --version=${{ matrix.wordpress }} $WP_CLI_ARGS
           wp config create --dbname=wordpress --dbuser=root --dbpass=root --dbhost=127.0.0.1 --skip-check $WP_CLI_ARGS
           if [ "${{ matrix.multisite }}" = "true" ]; then
             wp core multisite-install --title=CI --admin_user=admin --admin_email=admin@example.com --skip-email $WP_CLI_ARGS
