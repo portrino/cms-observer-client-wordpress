@@ -111,6 +111,8 @@ DDEV runs PHP 8.1, the lowest supported version. Dev tools live in
   `ddev open` (intro page with every instance).
   Login: `https://71.cms-observer-client-wordpress.ddev.site/wp-admin/`,
   `admin` / `Password1!`.
+- Run curl and other HTTP probes (the Observer, external APIs) inside the
+  container (`ddev exec curl ...`), not on the host.
 - `ddev composer test`: unit tests (`Build/phpunit.xml.dist`),
   `test:unit:coverage` adds coverage reports in `.Build/coverage`.
 - `ddev composer ci`: composer checks (normalize, audit, dependency analyser,
