@@ -58,7 +58,8 @@ WordPress 6.4+ on PHP 8.1+. Every change must work on all of them:
   (`redirection => 0`, so the bearer token can't follow one), success is 202.
 - Header `Update URI` points to GitHub, so wordpress.org can't offer
   "updates" for this slug. Remove it only when the plugin is published on
-  wordpress.org.
+  wordpress.org; until then the publish workflow strips it from the
+  separate WordPress.org ZIP only.
 
 ## API contract with the Observer
 
@@ -133,14 +134,17 @@ and multisite), activates the plugin and validates the `--dry-run` report.
 
 ## Releases
 
-- SemVer. Keep `Version` in the plugin header of `cms-observer-client.php` in
-  sync with the tag; the publish workflow refuses a tag that doesn't match.
+- SemVer. Keep `Version` in the plugin header of `cms-observer-client.php` and
+  `Stable tag` in `readme.txt` in sync with the tag (plus a changelog entry
+  there); the publish workflow refuses a tag that doesn't match.
   Don't put a top-level `version` into composer.json, Packagist takes it from
   the tag. Tag annotated (`git tag -a 1.0.0 -m "..."`), the message becomes
   the release notes.
-- Release targets: Packagist (`portrino/cms-observer-client-wordpress`) and a
-  ZIP on the GitHub release, built with `git archive --prefix=cms-observer-client/`
-  (honours `export-ignore`). GitHub's own source ZIP would unpack to a
+- Release targets: Packagist (`portrino/cms-observer-client-wordpress`) and two
+  ZIPs on the GitHub release, built with `git archive --prefix=cms-observer-client/`
+  (honours `export-ignore`): `cms-observer-client-<version>.zip` and
+  `cms-observer-client-<version>-wordpress-org.zip` without the `Update URI`
+  header, for WordPress.org. GitHub's own source ZIP would unpack to a
   different directory and change the plugin slug.
 - GitHub Actions are pinned to commit SHAs, Dependabot keeps them current.
 
