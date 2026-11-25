@@ -1,4 +1,5 @@
 === CMS Observer Client ===
+Contributors: portrino
 Tags: security, monitoring, updates, vulnerabilities, multisite
 Requires at least: 6.4
 Tested up to: 7.1
