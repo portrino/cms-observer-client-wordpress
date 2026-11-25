@@ -53,7 +53,8 @@ final class Plugin
         try {
             $this->createApiClient()->pushReport($this->createReportBuilder()->build());
         } catch (\Throwable $e) {
-            error_log('CMS Observer Client: ' . $e->getMessage());
+            // Also errors other than the rejected push, e.g. a failing report: the settings page is the only output of WP-Cron
+            LastPushError::save($e->getMessage());
         }
     }
 
