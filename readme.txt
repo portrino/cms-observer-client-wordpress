@@ -3,7 +3,7 @@ Tags: security, monitoring, updates, vulnerabilities, multisite
 Requires at least: 6.4
 Tested up to: 7.1
 Requires PHP: 8.1
-Stable tag: 2.0.2
+Stable tag: 2.0.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -79,6 +79,11 @@ WP-Cron only runs when the site gets visits. On sites with low traffic, or with 
 a system cron job, or run `wp cms-observer push` from one.
 
 == Changelog ==
+
+= 2.0.3 =
+* Show every failed push from WP-Cron on the settings page, also when the report can't be built. These errors are
+  no longer written to the PHP error log.
+* Add a readme.txt and leave the Markdown files out of the release ZIP.
 
 = 2.0.2 =
 * Maintenance release without functional changes.

@@ -4,7 +4,7 @@
  * Plugin Name:       CMS Observer Client
  * Plugin URI:        https://github.com/portrino/cms-observer-client-wordpress
  * Description:       Reports the WordPress core, PHP and database versions plus the installed plugins to a CMS Observer instance.
- * Version:           2.0.2
+ * Version:           2.0.3
  * Requires at least: 6.4
  * Requires PHP:      8.1
  * Author:            portrino GmbH
