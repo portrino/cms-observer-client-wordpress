@@ -1,7 +1,7 @@
 name: wordpress-multi-version-plugin
 repository: portrino/ddev-wordpress-multi-version-plugin
-version: 1.0.0
-install_date: "2026-11-17T12:47:03+01:00"
+version: 1.1.0
+install_date: "2026-11-25T02:22:32+01:00"
 project_files:
     - docker-compose.wordpress-setup.yaml
     - .setup/scripts/run
