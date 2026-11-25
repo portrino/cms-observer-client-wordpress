@@ -40,6 +40,7 @@ final class ObserverApiClient
         }
         // The token and the version inventory must never travel in cleartext
         if (strtolower((string)wp_parse_url($apiUrl, PHP_URL_SCHEME)) !== 'https') {
+            // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- escaped where it's output (settings page), WP-CLI shows plain text
             throw new \RuntimeException(sprintf('CMS Observer API URL must use https, got "%s".', $apiUrl), 1763150401);
         }
 
@@ -63,14 +64,17 @@ final class ObserverApiClient
     private function checkResponse(array|\WP_Error $response, string $token): void
     {
         if (is_wp_error($response)) {
+            // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- escaped where it's output (settings page), WP-CLI shows plain text
             throw new \RuntimeException('Sending the report to the CMS Observer failed: ' . $response->get_error_message(), 1763150402);
         }
         $status = (int)wp_remote_retrieve_response_code($response);
         // The reported domains don't match the site URL, e.g. a staging copy with the production database
         if ($status === 409) {
+            // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- escaped where it's output (settings page), WP-CLI shows plain text
             throw new \RuntimeException(sprintf('CMS Observer rejected the report (HTTP 409): %s', $this->getErrorMessage($response, $token)), 1763150404);
         }
         if ($status !== 202) {
+            // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- escaped where it's output (settings page), WP-CLI shows plain text
             throw new \RuntimeException(sprintf('CMS Observer rejected the report (HTTP %d).', $status), 1763150403);
         }
     }

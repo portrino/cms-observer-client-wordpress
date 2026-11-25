@@ -64,6 +64,7 @@ final class SettingsSaveHandler
             'updated' => ['success', __('Settings saved.', 'cms-observer-client')],
             'https-required' => ['error', __('The API URL must use https. It was not saved.', 'cms-observer-client')],
         ];
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- only selects one of the fixed notices, changes nothing
         $result = isset($_GET['result']) ? sanitize_key(wp_unslash($_GET['result'])) : '';
         if (isset($notices[$result])) {
             [$type, $message] = $notices[$result];
