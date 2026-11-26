@@ -9,6 +9,10 @@ final class ObserverApiClient
     // WordPress' default of 5 s is short for a report with many plugins
     private const TIMEOUT_SECONDS = 10;
 
+    // A 409 means the reported domains don't match the site URL, e.g. a staging copy with the production database
+    private const ERROR_CODES = [409 => 1763150404];
+    private const FALLBACK_REASONS = [409 => ': the reported domains don\'t match the site URL registered on the Observer.'];
+
     public function __construct(
         private readonly Configuration $configuration,
     ) {}
@@ -48,6 +52,8 @@ final class ObserverApiClient
             'headers' => [
                 'Authorization' => 'Bearer ' . $token,
                 'Content-Type' => 'application/json',
+                // without it the Observer answers a validation error (422) with an HTML page
+                'Accept' => 'application/json',
             ],
             'body' => json_encode($report, JSON_THROW_ON_ERROR),
             'timeout' => self::TIMEOUT_SECONDS,
@@ -68,29 +74,26 @@ final class ObserverApiClient
             throw new \RuntimeException('Sending the report to the CMS Observer failed: ' . $response->get_error_message(), 1763150402);
         }
         $status = (int)wp_remote_retrieve_response_code($response);
-        // The reported domains don't match the site URL, e.g. a staging copy with the production database
-        if ($status === 409) {
-            // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- escaped where it's output (settings page), WP-CLI shows plain text
-            throw new \RuntimeException(sprintf('CMS Observer rejected the report (HTTP 409): %s', $this->getErrorMessage($response, $token)), 1763150404);
+        if ($status === 202) {
+            return;
         }
-        if ($status !== 202) {
-            // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- escaped where it's output (settings page), WP-CLI shows plain text
-            throw new \RuntimeException(sprintf('CMS Observer rejected the report (HTTP %d).', $status), 1763150403);
-        }
+        // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- escaped where it's output (settings page), WP-CLI shows plain text
+        throw new \RuntimeException(sprintf('CMS Observer rejected the report (HTTP %d)%s', $status, $this->reason($response, $status, $token)), self::ERROR_CODES[$status] ?? 1763150403);
     }
 
     /**
+     * "message" says why a 409 was rejected, "detail" names the invalid field of a 422.
+     *
      * @param array<string, mixed> $response
      */
-    private function getErrorMessage(array $response, string $token): string
+    private function reason(array $response, int $status, string $token): string
     {
-        $body = json_decode(wp_remote_retrieve_body($response), true);
-        $message = is_array($body) && is_string($body['message'] ?? null) ? trim($body['message']) : '';
-        if ($message === '') {
-            return 'the reported domains don\'t match the site URL registered on the Observer.';
-        }
+        $body = (array)json_decode(wp_remote_retrieve_body($response), true);
+        $reason = $body['message'] ?? $body['detail'] ?? null;
 
         // Never show the token, even if the response echoes it
-        return str_replace($token, '***', $message);
+        return is_string($reason) && trim($reason) !== ''
+            ? ': ' . str_replace($token, '***', trim($reason))
+            : self::FALLBACK_REASONS[$status] ?? '.';
     }
 }

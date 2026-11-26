@@ -78,6 +78,7 @@ final class PushCommandTest extends TestCase
     {
         Functions\when('wp_remote_post')->justReturn([]);
         Functions\when('wp_remote_retrieve_response_code')->justReturn(401);
+        Functions\when('wp_remote_retrieve_body')->justReturn('');
 
         $this->expectExceptionMessage('WP_CLI::error: CMS Observer rejected the report (HTTP 401).');
         $this->createCommand()->push([], []);

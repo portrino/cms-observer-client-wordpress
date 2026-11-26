@@ -24,6 +24,7 @@ final class ObserverApiClientTest extends TestCase
         [$url, $args] = $this->sentRequest;
         self::assertSame('https://observer.test/api/v1/sites/report', $url);
         self::assertSame('Bearer secret', $args['headers']['Authorization']);
+        self::assertSame('application/json', $args['headers']['Accept']);
         self::assertSame('{"coreVersion":"7.1"}', $args['body']);
         self::assertSame(0, $args['redirection']);
         self::assertGreaterThan(5, $args['timeout']);
@@ -56,6 +57,14 @@ final class ObserverApiClientTest extends TestCase
     {
         $this->expectExceptionMessage('HTTP 401');
         $this->createClient('https://observer.test', 'secret', ['response' => ['code' => 401]])->pushReport([]);
+    }
+
+    public function testNamesTheInvalidFieldWhenTheReportFailsValidation(): void
+    {
+        $body = '{"title":"Validation Failed","status":422,"detail":"packages[3].version: This value should not be blank.","violations":[]}';
+
+        $this->expectExceptionMessage('CMS Observer rejected the report (HTTP 422): packages[3].version: This value should not be blank.');
+        $this->createClient('https://observer.test', 'secret', ['response' => ['code' => 422], 'body' => $body])->pushReport([]);
     }
 
     public function testShowsTheObserversMessageWithoutTheTokenOnAConflict(): void

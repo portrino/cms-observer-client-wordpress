@@ -87,7 +87,9 @@ lowercase, without scheme, port or path, unique and sorted; the hosts of
 array when there is none, never `null`. The Observer answers 409 when no
 domain matches the site URL (e.g. staging with the production database and
 token); the push fails with the `message` of the JSON body, the token is
-masked. The last failed push is kept in a network option (`LastPushError`)
+masked. Any other status fails with the `detail` of the JSON body if there
+is one, e.g. the invalid field of a 422; the client sends `Accept:
+application/json`, without it the Observer answers a 422 with an HTML page. The last failed push is kept in a network option (`LastPushError`)
 and shown on the settings page.
 
 The site must be created on the Observer with the type `wordpress`. Sites
