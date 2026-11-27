@@ -60,7 +60,8 @@ Alternatively define `CMS_OBSERVER_API_URL` and `CMS_OBSERVER_TOKEN` as constant
 environment variables. They take precedence over the settings page (environment variable first), so a shared
 `wp-config.php` can serve several environments.
 
-For Composer based setups the plugin is also available as `portrino/cms-observer-client-wordpress`.
+For Composer based setups the plugin is also available as `portrino/cms-observer-client-wordpress` (recommended,
+it replaces `wpackagist-plugin/cms-observer-client`).
 
 == Frequently Asked Questions ==
 

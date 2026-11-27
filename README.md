@@ -31,6 +31,10 @@ The **recommended** way for Composer based WordPress setups (e.g. [Bedrock](http
 composer require portrino/cms-observer-client-wordpress
 ```
 
+The plugin is also on [WPackagist](https://wpackagist.org/) as `wpackagist-plugin/cms-observer-client`, built from
+WordPress.org. Prefer the Packagist package: it is available right after a release and declares the PHP requirement.
+It replaces the WPackagist package, so both can't end up in the same plugin directory.
+
 ### ZIP
 
 Download `cms-observer-client-<version>.zip` from the

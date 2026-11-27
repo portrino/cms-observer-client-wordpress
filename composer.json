@@ -38,6 +38,9 @@
         "tomasvotruba/type-coverage": "^2.0",
         "typo3/coding-standards": "^0.8 || ^0.9"
     },
+    "replace": {
+        "wpackagist-plugin/cms-observer-client": "self.version"
+    },
     "autoload": {
         "psr-4": {
             "Portrino\\CmsObserverClient\\": "Classes/"
