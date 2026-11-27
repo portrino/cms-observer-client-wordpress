@@ -4,7 +4,7 @@ Tags: security, monitoring, updates, vulnerabilities, multisite
 Requires at least: 6.4
 Tested up to: 7.1
 Requires PHP: 8.1
-Stable tag: 2.0.4
+Stable tag: 2.0.5
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -80,6 +80,10 @@ WP-Cron only runs when the site gets visits. On sites with low traffic, or with 
 a system cron job, or run `wp cms-observer push` from one.
 
 == Changelog ==
+
+= 2.0.5 =
+* First release on WordPress.org. Updates now come from WordPress.org; installations of 2.0.4 or older look for
+  updates on GitHub and need one manual update to this version.
 
 = 2.0.4 =
 * A report the CMS Observer rejects as invalid (HTTP 422) now names the invalid field in the error message, instead of
