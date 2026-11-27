@@ -33,14 +33,15 @@ jobs:
           grep -Eq "^Stable tag: ${GITHUB_REF_NAME}\$" readme.txt \
             || { echo "The Stable tag in readme.txt doesn't match the tag ${GITHUB_REF_NAME}" >&2; exit 1; }
 
-      # The prefix is the plugin directory, so the ZIP installs under the plugin's slug
+      # The prefix is the plugin directory, so the ZIP installs under the plugin's slug.
+      # Outside the workspace: the WordPress.org deploy commits untracked files into the SVN trunk.
       - name: "Build the plugin ZIP"
-        run: git archive --format=zip --prefix=cms-observer-client/ -o "cms-observer-client-${GITHUB_REF_NAME}.zip" "${GITHUB_REF_NAME}"
+        run: git archive --format=zip --prefix=cms-observer-client/ -o "${RUNNER_TEMP}/cms-observer-client-${GITHUB_REF_NAME}.zip" "${GITHUB_REF_NAME}"
 
       - name: "Create the GitHub release"
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release create "${GITHUB_REF_NAME}" "cms-observer-client-${GITHUB_REF_NAME}.zip" --verify-tag --notes-from-tag --title "${GITHUB_REF_NAME}"
+        run: gh release create "${GITHUB_REF_NAME}" "${RUNNER_TEMP}/cms-observer-client-${GITHUB_REF_NAME}.zip" --verify-tag --notes-from-tag --title "${GITHUB_REF_NAME}"
 
       # Deploys the export-ignore filtered tree (.gitattributes) to trunk and tags/<version>
       - name: "Deploy to WordPress.org"
