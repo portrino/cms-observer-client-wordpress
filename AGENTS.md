@@ -147,6 +147,12 @@ and multisite), activates the plugin and validates the `--dry-run` report.
   `cms-observer-client-<version>.zip` on the GitHub release, built with
   `git archive --prefix=cms-observer-client/`. GitHub's own source ZIP would
   unpack to a different directory and change the plugin slug.
+- `.wordpress-org` holds the WordPress.org banner and icon; the deploy syncs
+  it to the SVN `assets` (with `--delete`, so nothing else belongs there) on
+  the next tag. `icon.svg` is the Observer logo; the PNGs are rendered from
+  `Build/wordpress-org/*.svg` (the magnifier handle as a polygon, ImageMagick
+  draws thick `<line>` strokes thin), e.g.
+  `ddev exec convert -background none -density 300 Build/wordpress-org/icon.svg -resize 256x256 .wordpress-org/icon-256x256.png`.
 - GitHub Actions are pinned to commit SHAs, Dependabot keeps them current.
 
 ## Git
