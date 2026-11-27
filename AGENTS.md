@@ -149,7 +149,10 @@ and multisite), activates the plugin and validates the `--dry-run` report.
   unpack to a different directory and change the plugin slug.
 - `.wordpress-org` holds the WordPress.org banner and icon; the deploy syncs
   it to the SVN `assets` (with `--delete`, so nothing else belongs there) on
-  the next tag. `icon.svg` is the Observer logo; the PNGs are rendered from
+  each tag. Between releases `wordpress-org-assets.yml` pushes `.wordpress-org`
+  and `readme.txt` (into `trunk` and the stable tag, nothing else) on every
+  push to main, once the readme's `Stable tag` is tagged; so a readme change
+  on main (e.g. `Tested up to`) shows on WordPress.org without a release. `icon.svg` is the Observer logo; the PNGs are rendered from
   `Build/wordpress-org/*.svg` (the magnifier handle as a polygon, ImageMagick
   draws thick `<line>` strokes thin), e.g.
   `ddev exec convert -background none -density 300 Build/wordpress-org/icon.svg -resize 256x256 .wordpress-org/icon-256x256.png`.

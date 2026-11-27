@@ -8,6 +8,10 @@ on:
 permissions:
   contents: read
 
+# Shares the SVN repository with wordpress-org-assets.yml
+concurrency:
+  group: wordpress-org-svn
+
 jobs:
   publish:
     runs-on: ubuntu-latest
