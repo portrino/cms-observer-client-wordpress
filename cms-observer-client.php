@@ -13,7 +13,6 @@
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain:       cms-observer-client
  * Network:           true
- * Update URI:        https://github.com/portrino/cms-observer-client-wordpress
  */
 
 declare(strict_types=1);
