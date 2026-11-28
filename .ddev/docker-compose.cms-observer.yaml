@@ -1,0 +1,7 @@
+# Lets the instances reach the local CMS Observer and its E2E site, which they push to
+# (.ddev/.setup/hooks/post-install.sh). Run `ddev restart` after changing it.
+services:
+  web:
+    external_links:
+      - ddev-router:cms-observer.ddev.site
+      - ddev-router:e2e.cms-observer.ddev.site

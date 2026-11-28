@@ -109,6 +109,13 @@ DDEV runs PHP 8.1, the lowest supported version. Dev tools live in
   `ddev open` (intro page with every instance).
   Login: `https://71.cms-observer-client-wordpress.ddev.site/wp-admin/`,
   `admin` / `Password1!`.
+- The instances push to the local Observer's E2E site
+  (`https://e2e.cms-observer.ddev.site`, reached via `external_links` in
+  `.ddev/docker-compose.cms-observer.yaml`): the install hook
+  `.ddev/.setup/hooks/post-install.sh` sets the constants `CMS_OBSERVER_API_URL`
+  and `CMS_OBSERVER_TOKEN` (`e2e-wordpress-<label>`, the project the
+  Observer's `ddev e2e-reset` creates for each instance). So
+  `ddev 71 wp cms-observer push` works once the Observer runs.
 - Run curl and other HTTP probes (the Observer, external APIs) inside the
   container (`ddev exec curl ...`), not on the host.
 - `ddev composer test`: unit tests (`Build/phpunit.xml.dist`),
